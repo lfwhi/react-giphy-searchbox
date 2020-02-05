@@ -30,6 +30,7 @@ type MasonryConfig = {
 
 type Props = {
   apiKey: string,
+  customApiUrl: string,
   gifListHeight: string,
   gifPerPage: number,
   listItemClassName: string,
@@ -50,6 +51,7 @@ type Props = {
 
 const ReactGiphySearchBox = ({
   apiKey,
+  customApiUrl,
   gifListHeight,
   gifPerPage,
   listItemClassName,
@@ -70,9 +72,11 @@ const ReactGiphySearchBox = ({
   const { query, handleInputChange, handleSubmit } = useSearchForm()
   const debouncedQuery = useDebounce(query, 500)
 
+  const customApiKey = apiKey !== '' ? `&api_key=${apiKey}` : ''
+
   const apiEndpoint = query ? 'search' : 'trending'
   const apiUrl = offset =>
-    `https://api.giphy.com/v1/gifs/${apiEndpoint}?api_key=${apiKey}&limit=${gifPerPage}&rating=${rating}&offset=${offset}&q=${query}`
+    `${customApiUrl}/${apiEndpoint}?limit=${gifPerPage}&rating=${rating}&offset=${offset}&q=${query}${customApiKey}`
 
   const [{ data, loading, error, lastPage }, fetch] = useApi()
 
@@ -164,6 +168,8 @@ const ReactGiphySearchBox = ({
 }
 
 ReactGiphySearchBox.defaultProps = {
+  customApiUrl: 'https://api.giphy.com/v1/gifs',
+  apiKey: '',
   gifListHeight: '300px',
   gifPerPage: 20,
   listItemClassName: '',
