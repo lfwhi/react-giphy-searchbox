@@ -1,8 +1,7 @@
 import { useReducer } from 'react'
-import axios from 'axios'
 import dataFetchReducer from '../reducers/dataFetchReducer'
 
-const useApi = () => {
+const useApi = (customHeaders = {}) => {
   const [state, dispatch] = useReducer(dataFetchReducer, {
     loading: false,
     error: false,
@@ -10,28 +9,26 @@ const useApi = () => {
     lastPage: false,
   })
 
-  const fetch = (url, isMore) => {
+  const fetchCall = (url, isMore) => {
     if (isMore) {
       dispatch({ type: 'FETCH_MORE_INIT' })
     } else {
       dispatch({ type: 'FETCH_INIT' })
     }
 
-    axios
-      .get(url)
-      .then(response => {
-        if (isMore) {
+    fetch(url, {
+      headers: customHeaders,
+    })
+      .then(async response => {
+        if (response.ok) {
+          const data = await response.json()
           dispatch({
             type: 'FETCH_MORE_SUCCESS',
-            payload: response.data.data,
-            pagination: response.data.pagination,
+            payload: data.data,
+            pagination: data.pagination,
           })
         } else {
-          dispatch({
-            type: 'FETCH_SUCCESS',
-            payload: response.data.data,
-            pagination: response.data.pagination,
-          })
+          dispatch({ type: 'FETCH_FAILURE' })
         }
       })
       .catch(() => {
@@ -39,7 +36,7 @@ const useApi = () => {
       })
   }
 
-  return [state, fetch]
+  return [state, fetchCall]
 }
 
 export default useApi

@@ -30,6 +30,7 @@ type MasonryConfig = {
 
 type Props = {
   apiKey: string,
+  customHeaders: Record<string, string>,
   customApiUrl: string,
   gifListHeight: string,
   gifPerPage: number,
@@ -52,6 +53,7 @@ type Props = {
 const ReactGiphySearchBox = ({
   apiKey,
   customApiUrl,
+  customHeaders,
   gifListHeight,
   gifPerPage,
   listItemClassName,
@@ -78,7 +80,7 @@ const ReactGiphySearchBox = ({
   const apiUrl = offset =>
     `${customApiUrl}/${apiEndpoint}?limit=${gifPerPage}&rating=${rating}&offset=${offset}&q=${query}${customApiKey}`
 
-  const [{ data, loading, error, lastPage }, fetch] = useApi()
+  const [{ data, loading, error, lastPage }, fetch] = useApi(customHeaders)
 
   const masonryConfigMatchMedia = useMedia(
     getMediaBreakpoints(masonryConfig),
@@ -170,6 +172,7 @@ const ReactGiphySearchBox = ({
 ReactGiphySearchBox.defaultProps = {
   customApiUrl: 'https://api.giphy.com/v1/gifs',
   apiKey: '',
+  customHeaders: {},
   gifListHeight: '300px',
   gifPerPage: 20,
   listItemClassName: '',
